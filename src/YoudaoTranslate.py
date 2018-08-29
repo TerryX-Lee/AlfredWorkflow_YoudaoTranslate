@@ -7,6 +7,7 @@ import random
 import hashlib
 import os
 import sys
+import functions
 reload(sys)
 sys.setdefaultencoding('utf8')
 
@@ -47,6 +48,7 @@ ICON_HISTORY = 'icon_history.png'
 ICON_DUANYU = 'icon_duanyu.png'
 ICON_FOLDER = 'icon_folder.png'
 ICON_TRASH = 'icon_trash.png'
+ICON_VB = 'icon_vocabularybook.png'
 
 ZHIYUN_URL = 'https://openapi.youdao.com/api'
 DICT_URL = 'http://dict.youdao.com/w/%s/'
@@ -57,9 +59,9 @@ ZHIYUN_KEY = ''
 user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36\
  (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
 
-def add_history_query(query,subtitle):
+def add_history_query(query,subtitle,fayin):
     with open(LOG_FILE,'a') as file:
-        log = query + '  ' + subtitle + '\n'
+        log = query + '  ' + subtitle + ' ' + fayin + '\n'
         file.write(log)
     
 
@@ -127,7 +129,7 @@ def handle_res_from_zhiyun(res,query):
         wf.add_item(u'有道无法翻译...',subtitle='请尝试其他方法查询',icon=ICON_ERROR)
         return []
     
-    return translations
+    return translations,fayin
 
 #by dict
 def translate_by_dict(query):
@@ -157,6 +159,7 @@ def handle_res_from_dict(html,query):
     block = soup.find('div',class_='trans-container')
     temp = block.find_all('a',class_='search-js')
     translations = []
+    fayin = ''
     
     if len(temp) != 0:
         for i in temp:
@@ -186,7 +189,7 @@ def handle_res_from_dict(html,query):
                     duanyuitems.add(item)
                     wf.add_item(item,subtitle=u'短语示例',arg=item+ARG_CONNECTOR+query,valid=True,icon=ICON_DUANYU)
             
-    return translations
+    return translations,fayin
 
 #
 def translate(query,zhiyun_flag):
@@ -199,13 +202,35 @@ def translate(query,zhiyun_flag):
             else:
                 wf.add_item(u'发生了未知的错误',subtitle='Error!')
         else:
-            translations = handle_res_from_zhiyun(res,query)
-            add_history_query(query,' '.join(translations))
+            translations,fayin = handle_res_from_zhiyun(res,query)
+            add_history_query(query,' '.join(translations),fayin)
+            cache_translate_info(query,fayin,translations)
     else:
         res = translate_by_dict(query)
-        translations = handle_res_from_dict(res.content,query)
-        add_history_query(query,' '.join(translations))
+        translations,fayin = handle_res_from_dict(res.content,query)
+        add_history_query(query,' '.join(translations),fayin)
+        cache_translate_info(query,fayin,translations)
         
+def get_vocabularybook():
+    uname = os.getenv('USER_NAME','').strip()
+    password = os.getenv('PASSWORD','').strip()
+    
+    if uname and password:
+        vb = functions.VocabularyBook(uname,password)
+        words = vb.show_words()
+        if not words:
+            wf.add_item(u'生词本为空',icon=ICON_ERROR)
+            return
+        for i in words:
+            item = i[0]+i[1]
+            subtitle = i[2]
+            wf.add_item(item,subtitle=subtitle,arg='',icon=ICON_VB)
+            
+    else:
+        wf.add_item(u'用户名或密码未添加',icon=ICON_ERROR)
+
+def cache_translate_info(word,fayin,translations):
+    wf.cache_data('translate_info',[word,fayin]+[translations])
 
 def main(wf):
     global ZHIYUN_ID,ZHIYUN_KEY
@@ -219,6 +244,8 @@ def main(wf):
         get_history_query()
     elif query == '*clear':
         del_history_query()
+    elif query == '*vb':
+        get_vocabularybook()
     else:
         
         ZHIYUN_ID = os.getenv('ZHIYUN_ID','').strip()
