@@ -251,6 +251,7 @@ def main(wf):
         ZHIYUN_ID = os.getenv('ZHIYUN_ID','').strip()
         ZHIYUN_KEY = os.getenv('ZHIYUN_KEY','').strip()
         
+        wf.add_item(query,subtitle=u'单词',arg=query+ARG_CONNECTOR+query,valid=True,icon=ICON_LOGO)
         if ZHIYUN_ID and ZHIYUN_KEY:
             translate(query,1)
         else:
