@@ -1,14 +1,14 @@
-# AlfredWorkflow_YoudaoTranslate v1.0
+# AlfredWorkflow_YoudaoTranslate v1.01
 alfred workflow，有道翻译
 
 主要是按我的使用习惯做的，有什么建议欢迎提出。
 
 ## 一、功能介绍
-####1.中英互译
-####2.选中文字翻译
-####3.发音
-####4.记录查询历史
-####5.添加单词到有道单词本
+#### 1.中英互译
+#### 2.选中文字翻译
+#### 3.发音
+#### 4.记录查询历史
+#### 5.添加单词到有道单词本
 
 ## 二、下载
 [从github下载](https://github.com/Rouwanzi/AlfredWorkflow_YoudaoTranslate/blob/master/YoudaoDict.alfredworkflow)
