@@ -1,4 +1,4 @@
-# AlfredWorkflow_YoudaoTranslate v1.01
+# AlfredWorkflow_YoudaoTranslate v1.10
 alfred workflow，有道翻译
 
 主要是按我的使用习惯做的，有什么建议欢迎提出。
@@ -9,6 +9,7 @@ alfred workflow，有道翻译
 #### 3.发音
 #### 4.记录查询历史
 #### 5.添加单词到有道单词本
+#### 6.多语言翻译
 
 
 ## 二、下载
@@ -69,5 +70,5 @@ alfred workflow，有道翻译
 
 
 ## 五、 更新日志
-v1.01  添加原始查询单词到下拉菜单第一行，方便复制
+v1.01  添加原始查询单词到下拉菜单第一行，方便复制  
 V1.10  添加多语言翻译功能
