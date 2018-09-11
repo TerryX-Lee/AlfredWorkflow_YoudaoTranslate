@@ -10,6 +10,7 @@ alfred workflow，有道翻译
 #### 4.记录查询历史
 #### 5.添加单词到有道单词本
 
+
 ## 二、下载
 [从github下载](https://github.com/Rouwanzi/AlfredWorkflow_YoudaoTranslate/blob/master/YoudaoDict.alfredworkflow)
 
@@ -40,15 +41,33 @@ alfred workflow，有道翻译
 添加有道智云的ID和key后即可使用
 ![](screencapture/bianliang.jpg)
 
+9.`#+语言代码`使用其他语种翻译
+
+语言|代码
+----|---
+中文|zh-CHS
+日文|ja
+英文|EN
+韩文|ko
+法文|fr
+俄文|ru
+葡萄牙文|pt
+西班牙文|es
+越南文|vi
+
+&nbsp;&nbsp;&nbsp;&nbsp;目前该功能只支持在提供有道智云账号的情况下使用。没有账号下，这个功能的开发投入和产出实在相差太大，并且后续维护也十分麻烦，基本没有后续开发的打算了。
+![](screencapture/otherlanguage.gif)
+
 ## 四、Todo
-- [ ] 多语言翻译支持
+- [X] 多语言翻译支持
 - [ ] 自动更新机制
-- [ ] 优化一些用户体验细节
 - [ ] 找一些好听的提示音添加
 - [ ] 图标
-- [ ] 单词本
-- [ ] 统一错误处理，形成完整的用户体验(alfred的大叉号太突兀了，风格不统一)
+- [ ] 围绕单词本的一些功能
+- [ ] 解决一些发音的问题
+- [ ] 单词本缓存，添加生词失败时，下次添加
 
 
 ## 五、 更新日志
 v1.01  添加原始查询单词到下拉菜单第一行，方便复制
+V1.10  添加多语言翻译功能

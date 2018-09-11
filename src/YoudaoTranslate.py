@@ -51,13 +51,22 @@ ICON_TRASH = 'icon_trash.png'
 ICON_VB = 'icon_vocabularybook.png'
 
 ZHIYUN_URL = 'https://openapi.youdao.com/api'
-DICT_URL = 'http://dict.youdao.com/w/%s/'
+DICT_URL = 'http://dict.youdao.com/w/%s/%s/'
+FANYI_URL = 'http://fanyi.youdao.com/translate?smartresult=dict&smartresult=rule'
 
 ZHIYUN_ID = ''
 ZHIYUN_KEY = ''
 
 user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36\
  (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
+
+def is_chinese(uchar):
+    for i in uchar:
+        if i >= u'\u4e00' and i<=u'\u9fa5':
+            continue
+        else:
+            return False
+    return True
 
 def add_history_query(query,subtitle,fayin):
     with open(LOG_FILE,'a') as file:
@@ -79,7 +88,7 @@ def del_history_query():
     wf.add_item(u'已清空历史记录',subtitle='多多查询，加油学英语吧~！',icon=ICON_TRASH)
 
 #by zhiyun
-def translate_by_zhiyun(query,ZHIYUN_ID,ZHIYUN_KEY):
+def translate_by_zhiyun(query,ZHIYUN_ID,ZHIYUN_KEY,froml='auto',tol='auto'):
     '''
     returns:   JSON
     '''
@@ -89,8 +98,8 @@ def translate_by_zhiyun(query,ZHIYUN_ID,ZHIYUN_KEY):
     
     data = {
             'q':urllib.quote(str(query)),
-#            'from':'auto',
-#            'to':'auto',
+            'from':froml,
+            'to':tol,
             'appKey':ZHIYUN_ID,
             'sign':str(sign),
             'salt':str(salt)
@@ -132,14 +141,14 @@ def handle_res_from_zhiyun(res,query):
     return translations,fayin
 
 #by dict
-def translate_by_dict(query):
-    url = DICT_URL % urllib.quote(str(query))
+def translate_by_dict(query,language='eng'):
+    url = DICT_URL % (language,urllib.quote(str(query)))
     data = {
             'Connection': 'keep-alive',
             'Content-Encoding': 'gzip',
             'Content-Language': 'zh-CN',
             'Content-Type': 'text/html; charset=utf-8',
-#            'User-Agent':user_agent,
+            'User-Agent':user_agent,
             'Vary': 'Accept-Encoding',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
             'Accept-Encoding': 'gzip, deflate',
@@ -151,6 +160,58 @@ def translate_by_dict(query):
     
     return res
 
+
+'''
+#by fanyi????????????????
+def translate_by_fanyi(query,froml,tol):
+    import time
+    
+    FANYI_URL = 'http://fanyi.youdao.com/translate?smartresult=dict&smartresult=rule'
+    
+    url = FANYI_URL
+    salt = str(int(time.time()*1000) + random.randint(0,10))
+    sign = 'fanyideskweb'+query+salt+'6x(ZHw]mwzX#u0V7@yfwK'
+    sign = hashlib.md5(sign).hexdigest()
+    
+    header = {
+            'User-Agent':user_agent
+            }
+    
+#    header = {
+#        "Accept":"application/json, text/javascript, */*; q=0.01",
+#        #Accept-Encoding:gzip, deflate
+##        "Accept-Language":"zh-CN,zh;q=0.9",
+#        "Connection":"keep-alive",
+#        "Content-Type":"application/x-www-form-urlencoded; charset=UTF-8",
+#        "Cookie":"OUTFOX_SEARCH_USER_ID_NCOO=1135910979.4269547; OUTFOX_SEARCH_USER_ID=-1364254390@10.168.1.8; fanyi-ad-id=40789; fanyi-ad-closed=1; JSESSIONID=aaafp6BJjIzwC4k7Mb5hw; ___rl__test__cookies=1520316265914",
+#        "Host":"fanyi.youdao.com",
+#        "Origin":"http://fanyi.youdao.com",
+#        "Referer":"http://fanyi.youdao.com/",
+#        "User-Agent":"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36",
+#        "X-Requested-With":"XMLHttpRequest"
+#    }
+    
+    data = {        
+            'i': 'Я люблю тебя.',
+#            'type':'ZH_CN2RU',
+            'type':'AUTO',
+#            'from': 'AUTO',
+#            'to': 'AUTO',
+            'smartresult': 'dict',
+            'client': 'fanyideskweb',
+            'salt': salt,
+            'sign': sign,
+            'doctype': 'json',
+            'version': '2.1',
+            'keyfrom': 'fanyi.web',
+            'action': 'FY_BY_REALTIME',
+            'typoResult': 'false'
+            }
+    
+    res = web.post(url,headers=header,data=data).json()
+    
+    return res
+'''
 
 def handle_res_from_dict(html,query):
     from bs4 import BeautifulSoup
@@ -191,6 +252,15 @@ def handle_res_from_dict(html,query):
             
     return translations,fayin
 
+def handle_res_from_zhiyun_other_language(res,query):
+    translations = []
+    if 'translation' in res:
+        result = res['translation'][0]
+        translations.append(result)
+        wf.add_item(result,arg=result+ARG_CONNECTOR+query,valid=True,icon=ICON_TRANSLATION)
+        
+    return translations    
+
 #
 def translate(query,zhiyun_flag):
     if zhiyun_flag:
@@ -210,6 +280,31 @@ def translate(query,zhiyun_flag):
         translations,fayin = handle_res_from_dict(res.content,query)
         add_history_query(query,' '.join(translations),fayin)
         cache_translate_info(query,fayin,translations)
+        
+#
+def translate_other_language(query,zhiyun_flag,language):
+    if zhiyun_flag:
+        if is_chinese(query):
+            froml = 'zh-CHS'
+            tol = language
+        else:
+            froml = language
+            tol = 'zh-CHS'
+        
+        res = translate_by_zhiyun(query,ZHIYUN_ID,ZHIYUN_KEY,froml,tol)
+        errorCode = res['errorCode']
+        if errorCode != u'0':
+            if errorCode in ERROR_CODE:
+                wf.add_item(ERROR_CODE[errorCode],subtitle='Error!',icon=ICON_ERROR)
+            else:
+                wf.add_item(u'发生了未知的错误',subtitle='Error!')
+        else:
+            translations = handle_res_from_zhiyun_other_language(res,query)
+            add_history_query(query,' '.join(translations),'')
+            cache_translate_info(query,'',translations)
+    
+    else:
+        wf.add_item(u'请注册智云账号',icon=ICON_ERROR)
         
 def get_vocabularybook():
     uname = os.getenv('USER_NAME','').strip()
@@ -246,6 +341,20 @@ def main(wf):
         del_history_query()
     elif query == '*vb':
         get_vocabularybook()
+    elif query.find('#') > -1:
+        raw = query.split(' ',1)
+        language = raw[0][1:]
+        query = raw[1]
+        
+        ZHIYUN_ID = os.getenv('ZHIYUN_ID','').strip()
+        ZHIYUN_KEY = os.getenv('ZHIYUN_KEY','').strip()
+        
+        wf.add_item(query,subtitle=u'单词',arg=query+ARG_CONNECTOR+query,valid=True,icon=ICON_LOGO)
+        if ZHIYUN_ID and ZHIYUN_KEY:
+            translate_other_language(query,1,language)
+        else:
+            translate_other_language(query,0,language)
+                
     else:
         
         ZHIYUN_ID = os.getenv('ZHIYUN_ID','').strip()

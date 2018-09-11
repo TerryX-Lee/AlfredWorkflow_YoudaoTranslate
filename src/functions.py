@@ -79,6 +79,7 @@ class VocabularyBook(object):
         if self.res_of_login.headers.get('Set-Cookie').find(self.username) > -1:
             cookie_dict = requests.utils.dict_from_cookiejar(self.conn.cookies)
             requests.utils.cookiejar_from_dict(cookie_dict,self.cj)
+            self.cj.save(COOKIE_FILENAME, ignore_discard=True, ignore_expires=True)
             return True
         else:
             return False
@@ -111,7 +112,7 @@ class VocabularyBook(object):
         (self.loginYoudao() and self._add_word(word,soundmark,explains)):
             notify(u'已经保存至有道单词本',sound='Glass')#####
         else:
-            notify(u'暂时保存在临时单词本，请网络条件好时再次尝试',sound=None)
+            notify(u'请网络条件好时再次尝试',sound=None)
             
     def _del_word(self,word):
         pass
