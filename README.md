@@ -1,4 +1,4 @@
-# AlfredWorkflow_YoudaoTranslate v1.10
+# AlfredWorkflow_YoudaoTranslate v1.21
 alfred workflow，有道翻译
 
 主要是按我的使用习惯做的，有什么建议欢迎提出。
@@ -24,6 +24,8 @@ alfred workflow，有道翻译
 
 3.双击`Ctrl`查询选中单词
 ![](screencapture/xuandingchaxun.gif)
+在条目中双击可以查询该条目，同样在查询历史中有用
+![](screencapture/tiaomuchaxun.gif)
 
 4.`Shift + Enter`发音
 
@@ -59,6 +61,7 @@ alfred workflow，有道翻译
 &nbsp;&nbsp;&nbsp;&nbsp;目前该功能只支持在提供有道智云账号的情况下使用。没有账号下，这个功能的开发投入和产出实在相差太大，并且后续维护也十分麻烦，基本没有后续开发的打算了。
 ![](screencapture/otherlanguage.gif)
 
+
 ## 四、Todo
 - [X] 多语言翻译支持
 - [ ] 自动更新机制
@@ -70,5 +73,7 @@ alfred workflow，有道翻译
 
 
 ## 五、 更新日志
-v1.01  添加原始查询单词到下拉菜单第一行，方便复制  
-V1.10  添加多语言翻译功能
+v1.01  添加原始查询单词到下拉菜单第一行，方便复制 
+v1.10  添加多语言翻译功能
+v1.11 调整了输入反馈
+v1.21 添加在条目双击ctrl查询该条目功能

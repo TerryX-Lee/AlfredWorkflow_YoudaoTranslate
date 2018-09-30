@@ -79,7 +79,7 @@ def get_history_query():
         with open(LOG_FILE,'r') as file:
             for item in file.readlines()[-1:-10:-1]:
                 temp = item.split('  ')
-                wf.add_item(temp[0],subtitle=temp[1],arg=temp[0]+ARG_CONNECTOR+temp[0],valid=True,icon=ICON_HISTORY)
+                wf.add_item(temp[0],subtitle=temp[1],arg=temp[0],valid=True,icon=ICON_HISTORY)
     except IOError:
         wf.add_item(u'没有历史记录',subtitle=u'加油学英语吧~！',icon=ICON_FOLDER)
         
@@ -114,7 +114,7 @@ def handle_res_from_zhiyun(res,query):
         
         translations = []
         for i in res['translation']:
-            wf.add_item(i,subtitle=u'单词释义',arg=i+ARG_CONNECTOR+query,valid=True,icon=ICON_TRANSLATION)
+            wf.add_item(i,subtitle=u'单词释义',arg=i,valid=True,icon=ICON_TRANSLATION)
         
         fayin = ''
         if 'uk-phonetic' in basic:
@@ -122,21 +122,21 @@ def handle_res_from_zhiyun(res,query):
         if 'us-phonetic' in basic:
             fayin += u'美'+'['+basic['us-phonetic']+'] '
         if fayin:
-            wf.add_item(fayin,subtitle=u'Shift + Enter发音',arg=fayin+ARG_CONNECTOR+query,valid=True,icon=ICON_PRONOUNCE)        
+            wf.add_item(fayin,subtitle=u'Shift + Enter发音',arg=fayin,valid=True,icon=ICON_PRONOUNCE)        
     
         for i in basic['explains']:
             translations.append(i)
-            wf.add_item(i,subtitle=u'单词释义',arg=i+ARG_CONNECTOR+query,valid=True,icon=ICON_TRANSLATION)
+            wf.add_item(i,subtitle=u'单词释义',arg=i,valid=True,icon=ICON_TRANSLATION)
         
         duanyu = res['web']
         for i in duanyu:
             head = i['key']
             tail = i['value']
             item = head + ' ' + ','.join(tail)
-            wf.add_item(item,subtitle=u'网络释义',arg=item+ARG_CONNECTOR+query,valid=True,icon=ICON_DUANYU)
+            wf.add_item(item,subtitle=u'网络释义',arg=item,valid=True,icon=ICON_DUANYU)
     except KeyError:
         wf.add_item(u'有道无法翻译...',subtitle='请尝试其他方法查询',icon=ICON_ERROR)
-        return []
+        return [],''
     
     return translations,fayin
 
@@ -160,59 +160,6 @@ def translate_by_dict(query,language='eng'):
     
     return res
 
-
-'''
-#by fanyi????????????????
-def translate_by_fanyi(query,froml,tol):
-    import time
-    
-    FANYI_URL = 'http://fanyi.youdao.com/translate?smartresult=dict&smartresult=rule'
-    
-    url = FANYI_URL
-    salt = str(int(time.time()*1000) + random.randint(0,10))
-    sign = 'fanyideskweb'+query+salt+'6x(ZHw]mwzX#u0V7@yfwK'
-    sign = hashlib.md5(sign).hexdigest()
-    
-    header = {
-            'User-Agent':user_agent
-            }
-    
-#    header = {
-#        "Accept":"application/json, text/javascript, */*; q=0.01",
-#        #Accept-Encoding:gzip, deflate
-##        "Accept-Language":"zh-CN,zh;q=0.9",
-#        "Connection":"keep-alive",
-#        "Content-Type":"application/x-www-form-urlencoded; charset=UTF-8",
-#        "Cookie":"OUTFOX_SEARCH_USER_ID_NCOO=1135910979.4269547; OUTFOX_SEARCH_USER_ID=-1364254390@10.168.1.8; fanyi-ad-id=40789; fanyi-ad-closed=1; JSESSIONID=aaafp6BJjIzwC4k7Mb5hw; ___rl__test__cookies=1520316265914",
-#        "Host":"fanyi.youdao.com",
-#        "Origin":"http://fanyi.youdao.com",
-#        "Referer":"http://fanyi.youdao.com/",
-#        "User-Agent":"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36",
-#        "X-Requested-With":"XMLHttpRequest"
-#    }
-    
-    data = {        
-            'i': 'Я люблю тебя.',
-#            'type':'ZH_CN2RU',
-            'type':'AUTO',
-#            'from': 'AUTO',
-#            'to': 'AUTO',
-            'smartresult': 'dict',
-            'client': 'fanyideskweb',
-            'salt': salt,
-            'sign': sign,
-            'doctype': 'json',
-            'version': '2.1',
-            'keyfrom': 'fanyi.web',
-            'action': 'FY_BY_REALTIME',
-            'typoResult': 'false'
-            }
-    
-    res = web.post(url,headers=header,data=data).json()
-    
-    return res
-'''
-
 def handle_res_from_dict(html,query):
     from bs4 import BeautifulSoup
     
@@ -225,19 +172,19 @@ def handle_res_from_dict(html,query):
     if len(temp) != 0:
         for i in temp:
             translations.append(i.string)
-            wf.add_item(i.string,subtitle=u'单词释义',arg=i.string+ARG_CONNECTOR+query,valid=True,icon=ICON_LOGO)
+            wf.add_item(i.string,subtitle=u'单词释义',arg=i.string,valid=True,icon=ICON_LOGO)
         
     else:
         fayin = soup.find_all('span',class_='pronounce')
         fayin = '  '.join(map(lambda x:x.get_text().replace(' ',''),fayin))
         fayin = fayin.replace('\n','')
         if fayin:
-            wf.add_item(fayin,subtitle=u'Shift + Enter发音',arg=fayin+ARG_CONNECTOR+query,valid=True,icon=ICON_PRONOUNCE)        
+            wf.add_item(fayin,subtitle=u'Shift + Enter发音',arg=fayin,valid=True,icon=ICON_PRONOUNCE)        
             
         translations = block.find_all('li')
         translations = map(lambda x:x.string,translations)
         for i in translations:
-            wf.add_item(i,subtitle=u'单词释义',arg=i+ARG_CONNECTOR+query,valid=True,icon=ICON_TRANSLATION)
+            wf.add_item(i,subtitle=u'单词释义',arg=i,valid=True,icon=ICON_TRANSLATION)
         
         duanyu = soup.find_all('p',class_='wordGroup')
         duanyuitems = set()
@@ -248,7 +195,7 @@ def handle_res_from_dict(html,query):
                 item = head.string+' '+tail
                 if item not in duanyuitems:
                     duanyuitems.add(item)
-                    wf.add_item(item,subtitle=u'短语示例',arg=item+ARG_CONNECTOR+query,valid=True,icon=ICON_DUANYU)
+                    wf.add_item(item,subtitle=u'短语示例',arg=item,valid=True,icon=ICON_DUANYU)
             
     return translations,fayin
 
@@ -257,7 +204,7 @@ def handle_res_from_zhiyun_other_language(res,query):
     if 'translation' in res:
         result = res['translation'][0]
         translations.append(result)
-        wf.add_item(result,arg=result+ARG_CONNECTOR+query,valid=True,icon=ICON_TRANSLATION)
+        wf.add_item(result,arg=result,valid=True,icon=ICON_TRANSLATION)
         
     return translations    
 
@@ -349,7 +296,7 @@ def main(wf):
         ZHIYUN_ID = os.getenv('ZHIYUN_ID','').strip()
         ZHIYUN_KEY = os.getenv('ZHIYUN_KEY','').strip()
         
-        wf.add_item(query,subtitle=u'单词',arg=query+ARG_CONNECTOR+query,valid=True,icon=ICON_LOGO)
+        wf.add_item(query,subtitle=u'单词',arg=query,valid=True,icon=ICON_LOGO)
         if ZHIYUN_ID and ZHIYUN_KEY:
             translate_other_language(query,1,language)
         else:
@@ -360,7 +307,7 @@ def main(wf):
         ZHIYUN_ID = os.getenv('ZHIYUN_ID','').strip()
         ZHIYUN_KEY = os.getenv('ZHIYUN_KEY','').strip()
         
-        wf.add_item(query,subtitle=u'单词',arg=query+ARG_CONNECTOR+query,valid=True,icon=ICON_LOGO)
+        wf.add_item(query,subtitle=u'单词',arg=query,valid=True,icon=ICON_LOGO)
         if ZHIYUN_ID and ZHIYUN_KEY:
             translate(query,1)
         else:

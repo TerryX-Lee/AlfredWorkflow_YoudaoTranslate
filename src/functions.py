@@ -130,6 +130,8 @@ class VocabularyBook(object):
 def main(wf):
     query = wf.args[0]
     job_num = int(wf.args[1])
+    translate_info = wf.cached_data('translate_info')
+    query = translate_info[0]
     
     if job_num == 1:
         command = "say --voice='Samantha' "+query
@@ -140,7 +142,6 @@ def main(wf):
     
         if uname and password:
             vb = VocabularyBook(uname,password)
-            translate_info = wf.cached_data('translate_info')
             vb.add_word(query,translate_info[1],' '.join(translate_info[2]))
         else:
             notify(u'用户名或密码未添加',sound=None)
