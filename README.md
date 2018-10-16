@@ -13,7 +13,7 @@ alfred workflow，有道翻译
 
 
 ## 二、下载
-[从github下载](https://github.com/Rouwanzi/AlfredWorkflow_YoudaoTranslate/blob/master/YoudaoDict.alfredworkflow)
+[从github下载](https://github.com/Rouwanzi/AlfredWorkflow_YoudaoTranslate/raw/master/YoudaoDict_v1.21.alfredworkflow)
 
 ## 三、使用说明
 1.`Enter`复制该条目
