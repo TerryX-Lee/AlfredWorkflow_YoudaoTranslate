@@ -1,8 +1,5 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
-"""
-@author: rouwanzi
-"""
 import os
 import sys
 import urllib

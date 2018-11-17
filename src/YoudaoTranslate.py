@@ -171,6 +171,7 @@ def translate_by_dict(query, language='eng'):
 def handle_res_from_dict(html, query):
     from bs4 import BeautifulSoup
 
+    # soup = BeautifulSoup(html, 'lxml')
     soup = BeautifulSoup(html)
     block = soup.find('div', class_='trans-container')
     temp = block.find_all('a', class_='search-js')
